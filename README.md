@@ -1,17 +1,18 @@
-====== Gamifikation for iTop ======
+# Gamifikation for iTop 
 
-===== Level system =====
+## Level system 
 
-A User gains EXP for diffent activities in iTop, e.g. created a object, deleted a object or finish a ticket. Every activity gives an different amount of EXP. \\
-The max. level is planed to be 25. [more or infinite are possible as well] \\
+A User gains EXP for diffent activities in iTop, e.g. created a object, deleted a object or finish a ticket. Every activity gives an different amount of EXP. 
+The max. level is planed to be 25. [more or infinite are possible as well] 
 
 A User gets better userrights or more funcionality from iTop for a higher level.
 
-===== EXP =====
+## EXP 
 
-==== Experiens point trigger ====
+### Experiens point trigger 
 
-^ Trigger ^ EXP ^
+| Trigger | EXP |
+| -------- | -------- |
 | assign ticket | 5 |
 | ticket in status closed | 25 |
 | update a object | 3 |
@@ -20,11 +21,11 @@ A User gets better userrights or more funcionality from iTop for a higher level.
 | export from data | 15 |
 | import from data | 20 |
 
-===== Classes =====
+## Classes 
 
 The classes are profiles from iTop. Every class need multiplate states of a profil.
 
-===== Sources =====
+## Sources
 
 All icons are from <a href="https://www.freepik.com" title="Freepik">Freepik</a>.
 
