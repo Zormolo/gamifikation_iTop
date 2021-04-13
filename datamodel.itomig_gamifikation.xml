@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <constants>
+  </constants>
+  <classes>
+      <class id="Playerinfo" _delta="define">
+       <parent>cmdbAbstractObject</parent>
+      <properties>
+        <category>bizmodel,searchable</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>playerinfo</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field>finalclass</db_final_class_field>
+        <naming>
+          <format>%1$s</format>
+          <attributes>
+            <attribute id="nickname"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <reconciliation>
+          <attributes>
+            <attribute id="player"/>
+            <attribute id="nickname"/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="nickname" xsi:type="AttributeString" _delta="define">
+          <sql>nickname</sql>
+          <default_value>Player</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="player" xsi:type="AttributeExternalKey">
+          <sql>player</sql>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <target_class>User</target_class>
+          <filter>SELECT User WHERE id NOT IN (SELECT User AS u JOIN Playerinfo AS p ON p.player = u.id)</filter>
+        </field>
+        <field id="gender" xsi:type="AttributeEnum" _delta="define">
+          <values>
+            <value id="male">male</value>
+            <value id="female">female</value>
+          </values>
+          <sql>gender</sql>
+          <default_value>male</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="exp" xsi:type="AttributeInteger" _delta="define">
+          <sql>exp</sql>
+          <default_value>0</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="lv" xsi:type="AttributeInteger" _delta="define">
+          <sql>lv</sql>
+          <default_value>1</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="lv_progress" xsi:type="AttributePercentage" _delta="define">
+          <sql>lv_progress</sql>
+          <default_value>0</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>              
+        <field id="score" xsi:type="AttributeInteger" _delta="define">
+          <sql>score</sql>
+          <default_value>0</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+        <field id="icon" xsi:type="AttributeImage" _delta="define">
+          <display_max_width>256</display_max_width>
+          <display_max_height>256</display_max_height>
+          <default_image>images/default.png</default_image>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+       <presentation>
+        <details>
+          <items>
+            <item id="col:col1">
+              <rank>5</rank>
+              <items>
+                <item id="fieldset:Playerinformation">
+                  <rank>10</rank>
+                  <items>
+                    <item id="nickname">
+                    <rank>10</rank>
+                    </item>
+                    <item id="player">
+                      <rank>20</rank>
+                    </item>
+                    <item id="gender">
+                      <rank>30</rank>
+                    </item>
+                  </items>
+                </item>
+                <item id="fieldset:Accountinformation">
+                  <rank>10</rank>
+                  <items>
+                    <item id="exp">
+                      <rank>40</rank>
+                    </item>
+                    <item id="lv">
+                      <rank>50</rank>
+                    </item>
+                    <item id="lv_progress">
+                      <rank>60</rank>
+                    </item>
+                    <item id="score">
+                      <rank>70</rank>
+                    </item>
+                  </items>
+                </item>
+              </items>
+            </item>
+            <item id="col:col2">
+              <rank>5</rank>
+              <items>
+                <item id="fieldset:Playericon">
+                  <rank>10</rank>
+                  <items>
+                    <item id="icon">
+                      <rank>10</rank>
+                    </item>
+                  </items>
+                </item>
+              </items>
+            </item>
+          </items>
+        </details>
+      </presentation>
+      <methods>
+        <method id="GetExp" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function GetExp($lv)
+            {
+              if($lv == 25) return 1;
+
+              return (int)(((5 * pow($lv, 3)) / 4) * ((100 - $lv) / 50));
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="ComputeValues">
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            public function ComputeValues()
+            {
+              $aktuelles_lv = $this->Get('lv');
+              $this->Set('score', $this->Get('score') + 1);
+              if($aktuelles_lv < 25)
+              {
+                $next_lv = $aktuelles_lv + 1;
+                $progress = (int)(($this->Get('exp') / $this->GetExp($next_lv)) * 100);
+                $this->Set('lv_progress', $progress);
+                if($progress >= 100){
+                  $this->Set('lv', $next_lv);
+                  if($next_lv == 25){
+                    $this->Set('exp', 0);
+                    $this->Set('lv_progress', 100);
+                  }else{
+                    $this->Set('exp', $this->Get('exp') - $this->GetExp($next_lv));
+                    $progress = (int)(($this->Get('exp') / $this->GetExp($next_lv + 1)) * 100);
+                    $this->Set('lv_progress', $progress);
+                  }
+                }
+              }
+              else{
+                $this->Set('lv_progress', 100);
+              }
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="GetAttributeFlags">
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            public function GetAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '')
+            {
+              // Force the computed field to be read-only, preventing it to be written
+              $lv_4 = (($sAttCode == 'nickname') && $this->Get('lv') < 4);
+              $lv_12 = (($sAttCode == 'icon') && $this->Get('lv') < 12);
+              if (($sAttCode == 'gender') || ($sAttCode == 'player') || ($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'score') || $lv_4 || $lv_12)
+                    return(OPT_ATT_READONLY | parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState));
+              return parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
+            }
+            ]]>
+          </code>
+        </method>
+      </methods>
+    </class>
+  </classes>
+  <menus>
+    <menu id="Gamification" xsi:type="MenuGroup" _delta="define">
+      <rank>150.45</rank>
+    </menu>
+    <menu id="Playerinfo:Player" xsi:type="NewObjectMenuNode" _delta="define">
+      <rank>1</rank>
+      <parent>Gamification</parent>
+      <class>Playerinfo</class>
+    </menu>
+    <menu id="Playerinfo:Highscore" xsi:type="DashboardMenuNode" _delta="define">
+      <rank>1</rank>
+      <parent>Gamification</parent>
+      <class>Playerinfo</class>
+      <definition>
+      </definition>
+    </menu>
+  </menus>
+  <user_rights>
+    <groups>
+    </groups>
+    <profiles>
+    </profiles>
+  </user_rights>
+</itop_design>
