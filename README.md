@@ -33,7 +33,6 @@ It's planned to receive different types of achievements for working with iTop, e
 ## Contact
 
 If you have any ideas or feedback, please message me.
-Mail: max.renner@itomig.de
 
 ## Sources
 
