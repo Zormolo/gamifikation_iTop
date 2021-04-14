@@ -1,11 +1,13 @@
-# Gamifikation for iTop 
+# Gamifikation for iTop [Prototype]
+
+This extension should support the work with iTop. It gives the opportunity to all users with a player class to gain EXP and level up for greater working experience. New members of your team can learn easier all iTop features,  because they get more and more access to all features of iTop over time.
 
 ## Level system 
 
-A User gains EXP for diffent activities in iTop, e.g. created a object, deleted a object or finish a ticket. Every activity gives an different amount of EXP. 
-The max. level is planed to be 25. [more or infinite are possible as well] 
+A User gains EXP for different activities in iTop, e.g. created an object, deleted an object or finish a ticket. Every activity gives a different amount of EXP.
+The max. level is planned to be 25. [more or infinite are possible as well] 
 
-A User gets better userrights or more funcionality from iTop for a higher level.
+A user gets better user rights or more functionality from iTop for a higher level.
 
 ## EXP 
 
@@ -23,7 +25,16 @@ A User gets better userrights or more funcionality from iTop for a higher level.
 
 ## Classes 
 
-The classes are profiles from iTop. Every class need multiplate states of a profil.
+The classes are profiles from iTop. Every class gets multiple states of a profile, so more feature from iTop are unlocked for the user.
+
+## Archivements
+
+It is planned to receive different types of achievements for working with iTop, e.g. first object created or 100 tickets solved.
+
+## Contact
+
+If you have any ideas or feedback, please message me.
+Mail: max.renner@itomig.de
 
 ## Sources
 
