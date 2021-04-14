@@ -1,4 +1,4 @@
-# Gamifikation for iTop [Prototype]
+# Gamification for iTop [Prototype]
 
 This extension adds gamification functionality to iTop. It provides an additional player class which stores experience level, experience points and provides a level-up mechanism for a gamified working experience. People new to iTop will have a flat learning curve,  because features are enabled step-by-step depending on the experience level. Long time motivation will stay higher due to earned achievements.
 
