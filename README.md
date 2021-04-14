@@ -10,7 +10,7 @@ A user gets better user rights or more functionality from iTop for a higher leve
 
 ## EXP 
 
-### Experiens point trigger 
+### Experience Point Trigger 
 
 | Trigger | EXP |
 | -------- | -------- |
@@ -26,7 +26,7 @@ A user gets better user rights or more functionality from iTop for a higher leve
 
 Character classes are modified standard user profiles from iTop. Every class gets multiple versions of a profile. These profile versions are activated depending on the experience level of the user, to enable new features, functions or user-rights. 
 
-## Archivements
+## Achievements
 
 It's planned to receive different types of achievements for working with iTop, e.g. first object created or 100 tickets solved.
 
