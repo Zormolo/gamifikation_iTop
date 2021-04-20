@@ -1,17 +1,16 @@
-# Gamifikation for iTop [Prototype]
+# Gamification for iTop [Prototype]
 
-This extension should support the work with iTop. It gives the opportunity to all users with a player class to gain EXP and level up for greater working experience. New members of your team can learn easier all iTop features,  because they get more and more access to all features of iTop over time.
+This extension adds gamification functionality to iTop. It provides an additional player class which stores experience level, experience points and provides a level-up mechanism for a gamified working experience. People new to iTop will get a flat learning curve,  because features are enabled step-by-step depending on the experience level. Long time motivation will stay higher due to earned achievements.
 
 ## Level system 
 
-A User gains EXP for different activities in iTop, e.g. created an object, deleted an object or finish a ticket. Every activity gives a different amount of EXP.
-The max. level is planned to be 25. [more or infinite are possible as well] 
+Users gain EXP for different activities in iTop, e.g. creating an object, delet object or resolve a ticket. With every activity a user gains a weighted amount of EXP. The maximum level is planned to be 25. [more or infinite are possible as well] 
 
 A user gets better user rights or more functionality from iTop for a higher level.
 
 ## EXP 
 
-### Experiens point trigger 
+### Experience Point Trigger 
 
 | Trigger | EXP |
 | -------- | -------- |
@@ -23,18 +22,17 @@ A user gets better user rights or more functionality from iTop for a higher leve
 | export from data | 15 |
 | import from data | 20 |
 
-## Classes 
+## Character Classes 
 
-The classes are profiles from iTop. Every class gets multiple states of a profile, so more feature from iTop are unlocked for the user.
+Character classes are modified standard user profiles from iTop. Every class gets multiple versions of a profile. These profile versions are activated depending on the experience level of the user, to enable new features, functions or user-rights. 
 
-## Archivements
+## Achievements
 
-It is planned to receive different types of achievements for working with iTop, e.g. first object created or 100 tickets solved.
+It's planned to receive different types of achievements for working with iTop, e.g. first object created or 100 tickets solved.
 
 ## Contact
 
 If you have any ideas or feedback, please message me.
-Mail: max.renner@itomig.de
 
 ## Sources
 
