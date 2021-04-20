@@ -25,6 +25,13 @@
             <attribute id="nickname"/>
           </attributes>
         </reconciliation>
+        <uniqueness_rules>
+          <rule id="nickname_uniqueness" _delta="define">
+            <attributes>
+              <attribute id="nickname"/>
+            </attributes>
+          </rule>
+        </uniqueness_rules>
       </properties>
       <fields>
         <field id="nickname" xsi:type="AttributeString" _delta="define">
@@ -75,7 +82,7 @@
           <is_null_allowed>false</is_null_allowed>
         </field>
       </fields>
-       <presentation>
+      <presentation>
         <details>
           <items>
             <item id="col:col1">
@@ -198,6 +205,131 @@
             ]]>
           </code>
         </method>
+        <method id="GetInitialStateAttributeFlags">
+          <static>false</static>
+          <access>public</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            public function GetInitialStateAttributeFlags($sAttCode, &$aReasons = array())
+            {       
+                // This function is invoked when the object is CREATED on the Console
+                // It is called for each and every field of the object, 
+                // but we just want to change the behavior for a single field
+                if (($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'icon') || ($sAttCode == 'score'))
+                {
+                    // Combine the new Flag with those imposed by a parent class
+                    return(OPT_ATT_READONLY | parent::GetInitialStateAttributeFlags($sAttCode, $aReasons));
+                }
+                // For other fields ask the parent class to do the job
+                return parent::GetInitialStateAttributeFlags($sAttCode, $aReasons);
+            }
+            ]]>
+          </code>
+        </method>
+      </methods>
+    </class>
+
+    <class id="FunctionalCI" _delta="if_exists">
+      <fields/>
+      <presentation/>
+      <methods>
+        <method id="OnInsert" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function OnInsert()
+            {       
+              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+			          $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + 5);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="OnUpdate" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function OnUpdate()
+            {       
+              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+			          $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + 1);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="OnDelete" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function OnDelete()
+            {       
+              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+			          $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + 3);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }
+            ]]>
+          </code>
+        </method>
       </methods>
     </class>
   </classes>
@@ -224,4 +356,35 @@
     <profiles>
     </profiles>
   </user_rights>
+  <dictionaries>
+      <dictionary id="EN US">
+      <entries>
+        <entry id="Class:Playerinfo/UniquenessRule:nickname_uniqueness" _delta="define">
+          <![CDATA[There is already a Player with the nickname '$this->nickname$']]>
+        </entry>
+      </entries>
+    </dictionary>
+    <dictionary id="DE DE">
+      <entries>
+        <entry id="Class:Playerinfo/UniquenessRule:nickname_uniqueness" _delta="define">
+          <![CDATA[Es existiert bereits ein Spieler mit dem Nicknamen '$this->nickname$']]>
+        </entry>
+      </entries>
+    </dictionary>
+  </dictionaries>
+  <branding>
+    <main_logo _delta="force">itomig_gamifikation/images/atom.png</main_logo>
+    <main_logo_compact _delta="force">itomig_gamifikation/images/atom(2).png</main_logo_compact>
+    <login_logo _delta="force">itomig_gamifikation/images/atom(2).png</login_logo>
+    <portal_logo _delta="force">itomig_gamifikation/images/atom(2).png</portal_logo>
+    <themes>
+      <imports>
+        <import id="css-variables">../css/css-variables.scss</import>
+      </imports>
+      <stylesheets>
+        <stylesheet id="jqueryui">../css/ui-lightness/jqueryui.scss</stylesheet>
+        <stylesheet id="main">../css/light-grey.scss</stylesheet>
+      </stylesheets>
+    </themes>
+  </branding>
 </itop_design>
