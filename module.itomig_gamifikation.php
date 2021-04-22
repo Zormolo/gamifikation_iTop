@@ -16,6 +16,7 @@ SetupWebPage::AddModule(
 		//
 		'dependencies' => array(
 			'itop-config-mgmt/2.7.1',
+			'itop-tickets/2.7.0',
 		),
 		'mandatory' => false,
 		'visible' => true,

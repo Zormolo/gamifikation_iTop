@@ -198,7 +198,7 @@
               // Force the computed field to be read-only, preventing it to be written
               $lv_4 = (($sAttCode == 'nickname') && $this->Get('lv') < 4);
               $lv_12 = (($sAttCode == 'icon') && $this->Get('lv') < 12);
-              if (($sAttCode == 'gender') || ($sAttCode == 'player') || ($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'score') || $lv_4 || $lv_12)
+              if (($sAttCode == 'exp') || ($sAttCode == 'gender') || ($sAttCode == 'player') || ($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'score') || $lv_4 || $lv_12)
                     return(OPT_ATT_READONLY | parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState));
               return parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
             }
@@ -216,7 +216,7 @@
                 // This function is invoked when the object is CREATED on the Console
                 // It is called for each and every field of the object, 
                 // but we just want to change the behavior for a single field
-                if (($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'icon') || ($sAttCode == 'score'))
+                if (($sAttCode == 'exp') || ($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'icon') || ($sAttCode == 'score'))
                 {
                     // Combine the new Flag with those imposed by a parent class
                     return(OPT_ATT_READONLY | parent::GetInitialStateAttributeFlags($sAttCode, $aReasons));
@@ -231,6 +231,109 @@
     </class>
 
     <class id="FunctionalCI" _delta="if_exists">
+      <fields/>
+      <presentation/>
+      <methods>
+        <method id="OnInsert" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function OnInsert()
+            {       
+              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+			          $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + 5);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="OnUpdate" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function OnUpdate()
+            {       
+              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+			          $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + 1);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="OnDelete" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function OnDelete()
+            {       
+              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+			          $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + 3);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }
+            ]]>
+          </code>
+        </method>
+      </methods>
+    </class>
+
+    <class id="Ticket" _delta="if_exists">
       <fields/>
       <presentation/>
       <methods>
@@ -347,6 +450,52 @@
       <parent>Gamification</parent>
       <class>Playerinfo</class>
       <definition>
+        <dashboard>
+          <layout>DashboardLayoutOneCol</layout>
+          <title/>
+          <auto_reload>
+            <enabled>false</enabled>
+            <interval>300</interval>
+          </auto_reload>
+          <cells>
+            <cell id="0">
+            <rank>0</rank>
+            <dashlets>
+              <dashlet id="CUSTOM__ID_row0_col0_1" xsi:type="DashletObjectList">
+                <rank>0</rank>
+                <title>Alle Spieler</title>
+                <query>SELECT Playerinfo</query>
+                <menu>true</menu>
+              </dashlet>
+            </dashlets>
+            </cell>
+            <cell id="1">
+              <rank>1</rank>
+              <dashlets>
+                <dashlet id="CUSTOM__ID_row1_col0_2" xsi:type="DashletGroupByBars">
+                  <rank>0</rank>
+                  <title>Highscore</title>
+                  <query>SELECT Playerinfo</query>
+                  <group_by>nickname</group_by>
+                  <style>bars</style>
+                  <aggregation_function>max</aggregation_function>
+                  <aggregation_attribute>score</aggregation_attribute>
+                  <limit/>
+                  <order_by>function</order_by>
+                  <order_direction>desc</order_direction>
+                </dashlet>
+              </dashlets>
+            </cell>
+            <cell id="2">
+              <rank>2</rank>
+              <dashlets>
+                <dashlet id="0" xsi:type="DashletEmptyCell">
+                 <rank>0</rank>
+                </dashlet>
+              </dashlets>
+            </cell>
+          </cells>
+        </dashboard>
       </definition>
     </menu>
   </menus>
