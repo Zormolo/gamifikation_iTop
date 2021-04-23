@@ -435,6 +435,683 @@
         </method>
       </methods>
     </class>
+
+    <class id="Incident" _delta="if_exists">
+      <fields/>
+      <presentation/>
+      <lifecycle>
+        <attribute/>
+        <stimuli/>
+        <states>
+          <state id="new" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_assign" _delta="redefine">
+                <target>assigned</target>
+                <actions>
+                  <action>
+                    <verb>SetCurrentDate</verb>
+                    <params>
+                      <param xsi:type="attcode">assignment_date</param>
+                    </params>
+                  </action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+              </transition>
+            </transitions>
+          </state>
+          <state id="escalated_tto" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_assign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+									<action>
+										<verb>SetAssignedDate</verb>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+           <state id="assigned" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_reassign" _delta="redefine">
+								<target>assigned</target>
+								<flags>
+									<attribute id="agent_id">
+										<must_change/>
+									</attribute>
+									<attribute id="team_id">
+										<must_prompt/>
+									</attribute>
+								</flags>
+                <actions>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+							</transition>
+              <transition id="ev_resolve" _delta="redefine">
+								<target>resolved</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">resolution_date</param>
+										</params>
+									</action>
+									<action>
+										<verb>SetElapsedTime</verb>
+										<params>
+											<param xsi:type="attcode">time_spent</param>
+											<param xsi:type="attcode">start_date</param>
+											<param xsi:type="string">DefaultWorkingTimeComputer</param>
+										</params>
+									</action>
+									<action>
+										<verb>ResolveChildTickets</verb>
+										<params/>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">25</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+          <state id="escalated_ttr" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_reassign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+							</transition>
+              <transition id="ev_resolve" _delta="redefine">
+								<target>resolved</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">resolution_date</param>
+										</params>
+									</action>
+									<action>
+										<verb>SetElapsedTime</verb>
+										<params>
+											<param xsi:type="attcode">time_spent</param>
+											<param xsi:type="attcode">start_date</param>
+											<param xsi:type="string">DefaultWorkingTimeComputer</param>
+										</params>
+									</action>
+									<action>
+										<verb>ResolveChildTickets</verb>
+										<params/>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">25</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+          <state id="pending" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_assign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+							</transition>
+            </transitions>
+          </state>
+          <state id="resolved" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_reopen" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+							</transition>
+              <transition id="ev_close" _delta="redefine">
+								<target>closed</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">close_date</param>
+										</params>
+									</action>
+                  <action>
+										<verb>GainBonusEXP</verb>
+										<params>
+											<param xsi:type="int">5</param>
+										</params>
+									</action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+        </states>
+      </lifecycle>
+      <methods>
+      	<method id="GainEXP" _delta="define">
+        <static>false</static>
+        <access>public</access>
+        <type>LifecycleAction</type>
+        <code>
+          <![CDATA[	
+          public function GainEXP($exp)
+          {      
+            $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+            try{
+              $oSearch = DBObjectSearch::FromOQL($sOQL);
+              $oSearch->AllowAllData();
+            }
+            catch (OQLException $e)
+            {
+              $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+              return $e->getMessage();
+            }
+            $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+            if($oSet->Count() > 0)
+            {
+              $oObj = $oSet->Fetch();
+              $oObj->Set('exp', $oObj->Get('exp') + $exp);
+              $oObj->DBUpdate();
+            } 
+            else{
+              return;
+            }
+          }]]>
+        </code>
+				</method>
+        <method id="GainBonusEXP" _delta="define">
+          <static>false</static>
+          <access>public</access>
+          <type>LifecycleAction</type>
+          <code>
+            <![CDATA[	
+            public function GainBonusEXP($exp)
+            {      
+              $agent_id = $this->Get('agent_id');
+              $sOQL = "SELECT Playerinfo WHERE player = $agent_id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+                if($this->Get('user_satisfaction') == 4) $exp *= 0;
+                if($this->Get('user_satisfaction') == 3) $exp *= 0.5;
+                //user_satisfaction == 2 exp bleibt gleich
+                if($this->Get('user_satisfaction') == 1) $exp *= 2;
+                $exp = (int) $exp;
+                $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + $exp);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }]]>
+          </code>
+				</method>
+      </methods>
+    </class>
+
+    <class id="UserRequest" _delta="if_exists">
+      <fields/>
+      <presentation/>
+      <lifecycle>
+        <attribute/>
+        <stimuli/>
+        <states>
+          <state id="new" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_assign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">assignment_date</param>
+										</params>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+          <state id="escalated_tto" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_assign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">assignment_date</param>
+										</params>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+           <state id="assigned" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_reassign" _delta="redefine">
+								<target>assigned</target>
+								<flags>
+									<attribute id="agent_id">
+										<must_change/>
+									</attribute>
+									<attribute id="team_id">
+										<must_prompt/>
+									</attribute>
+								</flags>
+                <actions>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+							</transition>
+              <transition id="ev_resolve" _delta="redefine">
+								<target>resolved</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">resolution_date</param>
+										</params>
+									</action>
+									<action>
+										<verb>SetElapsedTime</verb>
+										<params>
+											<param xsi:type="attcode">time_spent</param>
+											<param xsi:type="attcode">start_date</param>
+											<param xsi:type="string">DefaultWorkingTimeComputer</param>
+										</params>
+									</action>
+									<action>
+										<verb>ResolveChildTickets</verb>
+										<params/>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">25</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+          <state id="escalated_ttr" _delta="if_exists">
+            <flags/>
+            <transitions>
+							<transition id="ev_reassign" _delta="redefine">
+								<target>assigned</target>
+                <actions>
+								  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+							</transition>
+              <transition id="ev_resolve" _delta="redefine">
+								<target>resolved</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">resolution_date</param>
+										</params>
+									</action>
+									<action>
+										<verb>SetElapsedTime</verb>
+										<params>
+											<param xsi:type="attcode">time_spent</param>
+											<param xsi:type="attcode">start_date</param>
+											<param xsi:type="string">DefaultWorkingTimeComputer</param>
+										</params>
+									</action>
+									<action>
+										<verb>ResolveChildTickets</verb>
+										<params/>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">25</param>
+                    </params>
+                  </action>
+								</actions>
+              </transition>
+            </transitions>
+          </state>
+          <state id="approved" _delta="if_exists">
+						<transitions>
+							<transition id="ev_assign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">assignment_date</param>
+										</params>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+						</transitions>
+					</state>
+          <state id="pending" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_assign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+                   <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+          <state id="resolved" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_reopen" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+                   <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+              <transition id="ev_close" _delta="redefine">
+								<target>closed</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">close_date</param>
+										</params>
+									</action>
+                  <action>
+										<verb>GainBonusEXP</verb>
+										<params>
+											<param xsi:type="int">5</param>
+										</params>
+									</action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+        </states>
+      </lifecycle>
+      <methods>
+      	<method id="GainEXP" _delta="define">
+        <static>false</static>
+        <access>public</access>
+        <type>LifecycleAction</type>
+        <code>
+          <![CDATA[	
+          public function GainEXP($exp)
+          {      
+            $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+            try{
+              $oSearch = DBObjectSearch::FromOQL($sOQL);
+              $oSearch->AllowAllData();
+            }
+            catch (OQLException $e)
+            {
+              $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+              return $e->getMessage();
+            }
+            $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+            if($oSet->Count() > 0)
+            {
+              $oObj = $oSet->Fetch();
+              $oObj->Set('exp', $oObj->Get('exp') + $exp);
+              $oObj->DBUpdate();
+            } 
+            else{
+              return;
+            }
+          }]]>
+        </code>
+				</method>
+        <method id="GainBonusEXP" _delta="define">
+          <static>false</static>
+          <access>public</access>
+          <type>LifecycleAction</type>
+          <code>
+            <![CDATA[	
+            public function GainBonusEXP($exp)
+            {      
+              $agent_id = $this->Get('agent_id');
+              $sOQL = "SELECT Playerinfo WHERE player = $agent_id";
+              try{
+                $oSearch = DBObjectSearch::FromOQL($sOQL);
+                $oSearch->AllowAllData();
+              }
+              catch (OQLException $e)
+              {
+                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+                return $e->getMessage();
+              }
+              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+              if($oSet->Count() > 0)
+              {
+                if($this->Get('user_satisfaction') == 4) $exp *= 0;
+                if($this->Get('user_satisfaction') == 3) $exp *= 0.5;
+                //user_satisfaction == 2 exp bleibt gleich
+                if($this->Get('user_satisfaction') == 1) $exp *= 2;
+                $exp = (int) $exp;
+                $oObj = $oSet->Fetch();
+                $oObj->Set('exp', $oObj->Get('exp') + $exp);
+                $oObj->DBUpdate();
+              } 
+              else{
+                return;
+              }
+            }]]>
+          </code>
+				</method>
+      </methods>
+    </class>
+
+    <class id="Problem" _delta="if_exists">
+      <fields/>
+      <presentation/>
+      <lifecycle>
+        <attribute/>
+        <stimuli/>
+        <states>
+          <state id="new" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_assign" _delta="redefine">
+								<target>assigned</target>
+								<actions>
+									<action>
+										<verb>SetCurrentDate</verb>
+										<params>
+											<param xsi:type="attcode">assignment_date</param>
+										</params>
+									</action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+								</actions>
+							</transition>
+            </transitions>
+          </state>
+          <state id="assigned" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_reassign" _delta="redefine">
+                <target>assigned</target>
+                <actions>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+              </transition>
+              <transition id="ev_resolve" _delta="redefine">
+                <target>resolved</target>
+                <actions>
+                  <action>
+                      <verb>SetCurrentDate</verb>
+                      <params>
+                          <param xsi:type="attcode">resolution_date</param>
+                      </params>
+                  </action>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">25</param>
+                    </params>
+                  </action>
+                </actions>
+              </transition>
+            </transitions>
+          </state>
+          <state id="resolved" _delta="if_exists">
+            <flags/>
+            <transitions>
+              <transition id="ev_reassign" _delta="redefine">
+                <target>assigned</target>
+                <actions>
+                  <action>
+                    <verb>GainEXP</verb>
+                    <params>
+                      <param xsi:type="int">5</param>
+                    </params>
+                  </action>
+                </actions>
+              </transition>
+            </transitions>
+          </state>
+        </states>
+      </lifecycle>
+      <methods>
+      	<method id="GainEXP" _delta="define">
+        <static>false</static>
+        <access>public</access>
+        <type>LifecycleAction</type>
+        <code>
+          <![CDATA[	
+          public function GainEXP($exp)
+          {      
+            $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
+            try{
+              $oSearch = DBObjectSearch::FromOQL($sOQL);
+              $oSearch->AllowAllData();
+            }
+            catch (OQLException $e)
+            {
+              $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
+              return $e->getMessage();
+            }
+            $oSet = new DBObjectSet($oSearch, array() /* order */, array());
+            if($oSet->Count() > 0)
+            {
+              $oObj = $oSet->Fetch();
+              $oObj->Set('exp', $oObj->Get('exp') + $exp);
+              $oObj->DBUpdate();
+            } 
+            else{
+              return;
+            }
+          }]]>
+        </code>
+				</method>
+      </methods>
+    </class>
   </classes>
   <menus>
     <menu id="Gamification" xsi:type="MenuGroup" _delta="define">
