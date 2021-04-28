@@ -138,7 +138,7 @@
         </details>
       </presentation>
       <methods>
-        <method id="GetExp" _delta="define">
+       <method id="GetExp" _delta="define">
           <static>false</static>
           <access>protected</access>
           <type>Custom</type>
@@ -148,40 +148,63 @@
             {
               if($lv == 25) return 1;
 
-              return (int)(((5 * pow($lv, 3)) / 4) * ((100 - $lv) / 50));
+              return (int)((5 * pow($lv, 3)) / 4.0);
             }
             ]]>
           </code>
         </method>
-        <method id="ComputeValues">
+        <method id="ComputeEXP" _delta="define">
           <static>false</static>
-          <access>public</access>
+          <access>protected</access>
           <type>Custom</type>
           <code>
             <![CDATA[
-            public function ComputeValues()
+            protected function ComputeEXP()
             {
               $aktuelles_lv = $this->Get('lv');
               $this->Set('score', $this->Get('score') + 1);
               if($aktuelles_lv < 25)
               {
                 $next_lv = $aktuelles_lv + 1;
-                $progress = (int)(($this->Get('exp') / $this->GetExp($next_lv)) * 100);
+                error_log($this->GetExp($next_lv));
+                $progress = (int)(($this->Get('exp') * 100.0) / $this->GetExp($next_lv));
                 $this->Set('lv_progress', $progress);
-                if($progress >= 100){
+                if($progress >= 100)
+                {
                   $this->Set('lv', $next_lv);
-                  if($next_lv == 25){
+                  if($next_lv == 25)
+                  {
                     $this->Set('exp', 0);
                     $this->Set('lv_progress', 100);
-                  }else{
+                  }
+                  else
+                  {
                     $this->Set('exp', $this->Get('exp') - $this->GetExp($next_lv));
                     $progress = (int)(($this->Get('exp') / $this->GetExp($next_lv + 1)) * 100);
                     $this->Set('lv_progress', $progress);
                   }
                 }
               }
-              else{
+              else
+              {
                 $this->Set('lv_progress', 100);
+              }
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="OnUpdate" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function OnUpdate()
+            {
+              $aChanges = $this->ListChanges();  
+              if (array_key_exists('exp', $aChanges))
+              {
+                  $this->ComputeEXP();
               }
             }
             ]]>
