@@ -166,7 +166,6 @@
               if($aktuelles_lv < 25)
               {
                 $next_lv = $aktuelles_lv + 1;
-                error_log($this->GetExp($next_lv));
                 $progress = (int)(($this->Get('exp') * 100.0) / $this->GetExp($next_lv));
                 $this->Set('lv_progress', $progress);
                 if($progress >= 100)
@@ -176,19 +175,34 @@
                   {
                     $this->Set('exp', 0);
                     $this->Set('lv_progress', 100);
+                    return;
                   }
                   else
                   {
                     $this->Set('exp', $this->Get('exp') - $this->GetExp($next_lv));
                     $progress = (int)(($this->Get('exp') / $this->GetExp($next_lv + 1)) * 100);
                     $this->Set('lv_progress', $progress);
+                    if($this->Get('lv') == 2) $this->AddProfil();
                   }
                 }
               }
-              else
-              {
-                $this->Set('lv_progress', 100);
-              }
+              else $this->Set('lv_progress', 100);
+            }
+            ]]>
+          </code>
+        </method>
+        <method id="AddProfil" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Custom</type>
+          <code>
+            <![CDATA[
+            protected function AddProfil()
+            {
+              $profilecon = new URP_UserProfile();
+              $profilecon->Set('userid', $this->Get('player'));
+              $profilecon->Set('profileid', 1024);
+              $profilecon->DBInsert();
             }
             ]]>
           </code>
@@ -221,7 +235,7 @@
               // Force the computed field to be read-only, preventing it to be written
               $lv_4 = (($sAttCode == 'nickname') && $this->Get('lv') < 4);
               $lv_12 = (($sAttCode == 'icon') && $this->Get('lv') < 12);
-              if (($sAttCode == 'exp') || ($sAttCode == 'gender') || ($sAttCode == 'player') || ($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'score') || $lv_4 || $lv_12)
+              if (($sAttCode == 'gender') || ($sAttCode == 'player') || ($sAttCode == 'lv') || ($sAttCode == 'lv_progress') || ($sAttCode == 'score') || $lv_4 || $lv_12)
                     return(OPT_ATT_READONLY | parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState));
               return parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
             }
@@ -1186,14 +1200,6 @@
                 </dashlet>
               </dashlets>
             </cell>
-            <cell id="2">
-              <rank>2</rank>
-              <dashlets>
-                <dashlet id="0" xsi:type="DashletEmptyCell">
-                 <rank>0</rank>
-                </dashlet>
-              </dashlets>
-            </cell>
           </cells>
         </dashboard>
       </definition>
@@ -1201,8 +1207,74 @@
   </menus>
   <user_rights>
     <groups>
+      <group id="gamifikation" _delta="define">
+        <classes>
+          <class id="Playerinfo"/>
+        </classes>
+      </group>
+      <group id="lvlup" _delta="define">
+        <classes>
+          <class id="URP_UserProfile"/>
+        </classes>
+      </group>
     </groups>
     <profiles>
+      <profile id="3" _delta="if_exists">
+        <groups>
+          <group id="gamifikation" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+          <group id="lvlup" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+        </groups>
+      </profile>
+      <profile id="4" _delta="if_exists">
+        <groups>
+          <group id="gamifikation" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+          <group id="lvlup" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+        </groups>
+      </profile>
+      <profile id="5" _delta="if_exists">
+        <groups>
+          <group id="gamifikation" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+          <group id="lvlup" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+        </groups>
+      </profile>
+      <profile id="10" _delta="if_exists">
+        <groups>
+          <group id="gamifikation" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+          <group id="lvlup" _delta="define">
+            <actions>
+              <action id="action:write">allow</action>
+            </actions>
+          </group>
+        </groups>
+      </profile>
     </profiles>
   </user_rights>
   <dictionaries>
