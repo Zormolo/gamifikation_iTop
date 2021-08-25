@@ -215,6 +215,7 @@
             <![CDATA[
             protected function OnUpdate()
             {
+              $oUser = UserRights::GetUserObject()->Get('id');
               $aChanges = $this->ListChanges();  
               if (array_key_exists('exp', $aChanges))
               {
@@ -279,23 +280,12 @@
             <![CDATA[
             protected function OnInsert()
             {       
-              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
-              try{
-                $oSearch = DBObjectSearch::FromOQL($sOQL);
-                $oSearch->AllowAllData();
+              $oUserID = UserRights::GetUserObject()->Get('id');
+              $oObject = MetaModel::GetObject('Playerinfo', $oUserID, false);
+              if(is_object($oObject)){
+                $oObject->Set('exp', $oObj->Get('exp') + 5);
+                $oObject->DBUpdate();
               }
-              catch (OQLException $e)
-              {
-                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
-                return $e->getMessage();
-              }
-              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
-              if($oSet->Count() > 0)
-              {
-			          $oObj = $oSet->Fetch();
-                $oObj->Set('exp', $oObj->Get('exp') + 5);
-                $oObj->DBUpdate();
-              } 
               else{
                 return;
               }
@@ -310,27 +300,16 @@
           <code>
             <![CDATA[
             protected function OnUpdate()
-            {       
-              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
-              try{
-                $oSearch = DBObjectSearch::FromOQL($sOQL);
-                $oSearch->AllowAllData();
+            {  
+              $oUserID = UserRights::GetUserObject()->Get('id');
+              $oObject = MetaModel::GetObject('Playerinfo', $oUserID, false);
+              if(is_object($oObject)){
+                $oObject->Set('exp', $oObj->Get('exp') + 1);
+                $oObject->DBUpdate();
               }
-              catch (OQLException $e)
-              {
-                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
-                return $e->getMessage();
-              }
-              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
-              if($oSet->Count() > 0)
-              {
-			          $oObj = $oSet->Fetch();
-                $oObj->Set('exp', $oObj->Get('exp') + 1);
-                $oObj->DBUpdate();
-              } 
               else{
                 return;
-              }
+              }     
             }
             ]]>
           </code>
@@ -342,27 +321,16 @@
           <code>
             <![CDATA[
             protected function OnDelete()
-            {       
-              $sOQL = "SELECT Playerinfo WHERE player = :current_user->id";
-              try{
-                $oSearch = DBObjectSearch::FromOQL($sOQL);
-                $oSearch->AllowAllData();
+            { 
+              $oUserID = UserRights::GetUserObject()->Get('id');
+              $oObject = MetaModel::GetObject('Playerinfo', $oUserID, false);
+              if(is_object($oObject)){
+                $oObject->Set('exp', $oObj->Get('exp') + 3);
+                $oObject->DBUpdate();
               }
-              catch (OQLException $e)
-              {
-                $this->m_aWebrequestErrors[] = "query syntax error for recipient '$sOqlAttCode'";
-                return $e->getMessage();
-              }
-              $oSet = new DBObjectSet($oSearch, array() /* order */, array());
-              if($oSet->Count() > 0)
-              {
-			          $oObj = $oSet->Fetch();
-                $oObj->Set('exp', $oObj->Get('exp') + 3);
-                $oObj->DBUpdate();
-              } 
               else{
                 return;
-              }
+              }      
             }
             ]]>
           </code>
